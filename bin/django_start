@@ -2,7 +2,7 @@
 
 NAME="djangoblog" # Name of the application
 DJANGODIR=/home/blog/dev/DjangoBlog # Django project directory
-SOCKFILE=/var/www/DjangoBlog/run/gunicorn.sock # we will communicte using this unix socket
+SOCKFILE=/home/blog/dev/DjangoBlog/run/gunicorn.sock # we will communicte using this unix socket
 USER=root # the user to run as
 GROUP=root # the group to run as
 NUM_WORKERS=3 # how many worker processes should Gunicorn spawn
@@ -21,16 +21,18 @@ export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 # create the run directory if it doesn't exist
 #rundir=$(dirname $sockfile)
 RUNDIR=$(dirname $SOCKFILE)
+echo $RUNDIR
 test -d $RUNDIR || mkdir -p $RUNDIR
 
 # start your django unicorn
 # programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
 # exec /var/www/dev/python3/bin/gunicorn ${django_wsgi_module}:application \
 echo ${django_wsgi_module}
-exec /home/blog/dev/python3/bin/gunicorn ${DJANGO_WSGI_MODULE}:application -b 0.0.0.0:80\ 
+exec /home/blog/dev/python3/bin/gunicorn -b 0.0.0.0:8000 ${DJANGO_WSGI_MODULE}:application \
 --name $NAME \
 --workers $NUM_WORKERS \
 --user=$USER --group=$GROUP \
 --bind=unix:$SOCKFILE \
 --log-level=debug \
---log-file=-
+--log-file=/home/blog/dev/DjangoBlog/gunicorn.log
+
